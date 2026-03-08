@@ -48,6 +48,104 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 
 ## Bugs Encontrados
 
+### BUG-005 - Cadastro de curso aceita envio com campos vazios e sem validação de formato
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Sistema permite cadastrar curso sem preencher nenhum campo e sem validar formato dos dados |
+| **Passos para reproduzir** | 1. Acessar a tela de cadastro de curso <br> 2. Deixar todos os campos em branco <br> 3. Clicar em "Cadastrar Curso" |
+| **Resultado atual**  | Curso é cadastrado com sucesso mesmo sem nenhum dado preenchido |
+| **Resultado esperado** | Sistema deve validar campos obrigatórios (Nome, Descrição, Instrutor, Datas, Vagas, Tipo) e o formato correto de cada campo antes de permitir o cadastro |
+| **Endpoint**       | `POST https://creative-sherbet-a51eac.netlify.app/test-api/courses` |
+| **Severidade**     | Alta                                                   |
+
+---
+
+### BUG-012 - Dados do cadastro de curso são salvos apenas no localStorage e não persistidos na API
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Sistema armazena os cursos somente no localStorage do navegador, sem enviar para a API, causando perda de dados |
+| **Passos para reproduzir** | 1. Cadastrar um ou mais cursos <br> 2. Inspecionar o localStorage do navegador <br> 3. Verificar que os dados existem apenas localmente e não são enviados ao endpoint `POST /test-api/courses` |
+| **Resultado atual**  | Cursos salvos apenas no localStorage, com dados inválidos e sem persistência real. Exemplo do payload armazenado: <br><br> `[{"id":1,"name":"","description":"","cover":"","startDate":"2026-05-14","endDate":"2026-03-12","numberOfVagas":"","type":{"label":"","value":""},"address":"","instructor":"","url":""},{"id":2,"name":"","description":"","cover":"osanopiksmopmsps","startDate":"2026-03-18","endDate":"2026-03-02","numberOfVagas":"-111111817718","type":{"label":"","value":""},"address":"","instructor":"  ","url":""},{"id":3,"name":"","description":"","cover":"","startDate":"","endDate":"","numberOfVagas":"","type":{"label":"Online","value":"online"},"address":"0o","instructor":"","url":"dddddd"}]` |
+| **Resultado esperado** | Dados devem ser enviados e persistidos na API (`POST https://creative-sherbet-a51eac.netlify.app/test-api/courses`), garantindo que não sejam perdidos ao limpar o navegador ou trocar de dispositivo |
+| **Endpoint**       | `POST https://creative-sherbet-a51eac.netlify.app/test-api/courses` |
+| **Severidade**     | Crítica                                                |
+
+---
+
+### BUG-011 - Campo "Link de inscrição" não valida se o valor é uma URL válida
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Sistema permite cadastrar curso online com valor inválido no campo de link de inscrição |
+| **Passos para reproduzir** | 1. Acessar a tela de cadastro de curso <br> 2. Selecionar o tipo "Online" <br> 3. Preencher o campo "Link de inscrição" com um texto qualquer (ex: `abc123`, `não é uma url`) <br> 4. Clicar em "Cadastrar Curso" |
+| **Resultado atual**  | Curso é cadastrado com sucesso mesmo com valor inválido no campo de link de inscrição |
+| **Resultado esperado** | Sistema deve validar que o valor informado é uma URL válida (ex: `https://...`) antes de permitir o cadastro |
+| **Severidade**     | Média                                                  |
+
+---
+
+### BUG-010 - Datas exibidas na listagem de cursos sem formatação adequada
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Datas exibidas na listagem de cursos no formato bruto do JavaScript (`YYYY-MM-DD`) em vez de formato legível |
+| **Passos para reproduzir** | 1. Cadastrar um curso com datas de início e fim <br> 2. Acessar a listagem de cursos e observar as datas exibidas |
+| **Resultado atual**  | Datas exibidas no formato `2026-03-18` (formato ISO/input Date do JavaScript) |
+| **Resultado esperado** | Datas devem ser formatadas para exibição amigável, ex: `18/03/2026` |
+| **Severidade**     | Baixa                                                  |
+
+---
+
+### BUG-009 - Campo "URL da imagem de capa" aceita valores que não são URLs válidas
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Sistema permite cadastrar curso com valor inválido no campo de URL da imagem de capa |
+| **Passos para reproduzir** | 1. Acessar a tela de cadastro de curso <br> 2. Preencher o campo "URL da imagem de capa" com um texto qualquer (ex: `abc123`, `não é uma url`) <br> 3. Clicar em "Cadastrar Curso" |
+| **Resultado atual**  | Curso é cadastrado com sucesso mesmo com valor inválido no campo de URL |
+| **Resultado esperado** | Sistema deve validar que o valor informado é uma URL válida (ex: `https://...`) antes de permitir o cadastro |
+| **Severidade**     | Média                                                  |
+
+---
+
+### BUG-008 - Campo "Número de vagas" aceita valores negativos
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Sistema permite cadastrar curso com número de vagas negativo |
+| **Passos para reproduzir** | 1. Acessar a tela de cadastro de curso <br> 2. Preencher o campo "Número de vagas" com um valor negativo (ex: -1111118) <br> 3. Clicar em "Cadastrar Curso" |
+| **Resultado atual**  | Curso é cadastrado com sucesso com número de vagas negativo |
+| **Resultado esperado** | Sistema deve validar que o número de vagas é um valor inteiro maior que zero |
+| **Severidade**     | Alta                                                   |
+
+---
+
+### BUG-007 - Data de fim aceita valor menor que a data de início
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Sistema permite cadastrar curso com data de fim anterior à data de início |
+| **Passos para reproduzir** | 1. Acessar a tela de cadastro de curso <br> 2. Preencher a data de início com uma data futura (ex: 10/06/2026) <br> 3. Preencher a data de fim com uma data anterior (ex: 01/01/2026) <br> 4. Clicar em "Cadastrar Curso" |
+| **Resultado atual**  | Curso é cadastrado com sucesso mesmo com a data de fim menor que a data de início |
+| **Resultado esperado** | Sistema deve validar que a data de fim é igual ou posterior à data de início e bloquear o cadastro caso contrário |
+| **Severidade**     | Alta                                                   |
+
+---
+
+### BUG-006 - Listagem de cursos não exibe mensagem quando não há cursos cadastrados
+
+| Campo              | Descrição                                              |
+|--------------------|--------------------------------------------------------|
+| **Título**         | Tela de listagem de cursos não exibe mensagem de estado vazio |
+| **Passos para reproduzir** | 1. Acessar a listagem de cursos sem nenhum curso cadastrado |
+| **Resultado atual**  | Tela exibida em branco, sem nenhuma mensagem informativa |
+| **Resultado esperado** | Deve exibir uma mensagem como "Nenhum curso cadastrado no momento" |
+| **Severidade**     | Baixa                                                  |
+
+---
+
 ### BUG-002 - Ausência de endpoint para edição de curso
 
 | Campo              | Descrição                                              |
