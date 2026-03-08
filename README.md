@@ -27,22 +27,196 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 
 ## Cenários de Teste
 
-### CT-001 - Cadastro de curso com todos os campos preenchidos
+### CT-001 - Cadastro de curso com todos os campos preenchidos corretamente
 
-| Campo            | Valor utilizado        |
-|------------------|------------------------|
-| Nome do curso    | Informado              |
-| Descrição        | Informada              |
-| Instrutor        | Informado              |
-| URL de capa      | Informada              |
-| Data de início   | Informada (dd/mm/aaaa) |
-| Data de fim      | Informada (dd/mm/aaaa) |
-| Número de vagas  | Informado              |
-| Tipo de curso    | Selecionado            |
+**Pré-condição:** Usuário está na tela de cadastro de curso.
 
-**Resultado esperado:** Curso cadastrado com sucesso.
+| Campo            | Valor utilizado              |
+|------------------|------------------------------|
+| Nome do curso    | Curso de QA Avançado         |
+| Descrição        | Aprenda QA do zero ao avançado |
+| Instrutor        | João Silva                   |
+| URL de capa      | https://img.exemplo.com/capa.jpg |
+| Data de início   | 01/06/2026                   |
+| Data de fim      | 30/06/2026                   |
+| Número de vagas  | 50                           |
+| Tipo de curso    | Online                       |
+
+**Resultado esperado:** Curso cadastrado com sucesso e exibido na listagem.
 **Resultado obtido:** Curso cadastrado com sucesso.
 **Status:** Passou
+
+---
+
+### CT-002 - Cadastro de curso com campos obrigatórios vazios
+
+**Pré-condição:** Usuário está na tela de cadastro de curso.
+
+| Ação                        | Detalhe                          |
+|-----------------------------|----------------------------------|
+| Deixar todos os campos em branco | Não preencher nenhum campo  |
+| Clicar em "Cadastrar Curso" | —                                |
+
+**Resultado esperado:** Sistema exibe mensagem de erro para cada campo obrigatório e bloqueia o cadastro.
+**Resultado obtido:** Curso é cadastrado com sucesso mesmo sem nenhum dado preenchido.
+**Status:** Falhou — ver **BUG-005**
+
+---
+
+### CT-003 - Cadastro de curso com data de fim anterior à data de início
+
+**Pré-condição:** Usuário está na tela de cadastro de curso.
+
+| Campo           | Valor utilizado |
+|-----------------|-----------------|
+| Data de início  | 10/06/2026      |
+| Data de fim     | 01/01/2026      |
+
+**Resultado esperado:** Sistema valida e bloqueia o cadastro com mensagem de erro informando que a data de fim não pode ser anterior à data de início.
+**Resultado obtido:** Curso é cadastrado com sucesso mesmo com data de fim inválida.
+**Status:** Falhou — ver **BUG-007**
+
+---
+
+### CT-004 - Cadastro de curso com número de vagas negativo
+
+**Pré-condição:** Usuário está na tela de cadastro de curso.
+
+| Campo            | Valor utilizado |
+|------------------|-----------------|
+| Número de vagas  | -1111118        |
+
+**Resultado esperado:** Sistema valida e bloqueia o cadastro, exibindo mensagem que o número de vagas deve ser maior que zero.
+**Resultado obtido:** Curso é cadastrado com sucesso com número de vagas negativo.
+**Status:** Falhou — ver **BUG-008**
+
+---
+
+### CT-005 - Cadastro de curso com URL de imagem de capa inválida
+
+**Pré-condição:** Usuário está na tela de cadastro de curso.
+
+| Campo              | Valor utilizado      |
+|--------------------|----------------------|
+| URL da imagem de capa | abc123 (texto livre) |
+
+**Resultado esperado:** Sistema valida e bloqueia o cadastro informando que a URL deve ser válida (ex: `https://...`).
+**Resultado obtido:** Curso é cadastrado com sucesso com valor inválido no campo de URL.
+**Status:** Falhou — ver **BUG-009**
+
+---
+
+### CT-006 - Cadastro de curso online com link de inscrição inválido
+
+**Pré-condição:** Usuário está na tela de cadastro de curso com tipo "Online" selecionado.
+
+| Campo              | Valor utilizado        |
+|--------------------|------------------------|
+| Tipo de curso      | Online                 |
+| Link de inscrição  | não é uma url          |
+
+**Resultado esperado:** Sistema valida e bloqueia o cadastro informando que o link de inscrição deve ser uma URL válida.
+**Resultado obtido:** Curso é cadastrado com sucesso mesmo com link inválido.
+**Status:** Falhou — ver **BUG-011**
+
+---
+
+### CT-007 - Listagem de cursos sem nenhum curso cadastrado
+
+**Pré-condição:** Não há cursos cadastrados na aplicação.
+
+| Ação                        | Detalhe                         |
+|-----------------------------|---------------------------------|
+| Acessar a listagem de cursos | Nenhum curso cadastrado        |
+
+**Resultado esperado:** Tela exibe mensagem informativa como "Nenhum curso cadastrado no momento".
+**Resultado obtido:** Tela exibida em branco, sem nenhuma mensagem.
+**Status:** Falhou — ver **BUG-006**
+
+---
+
+### CT-008 - Verificar formatação das datas na listagem de cursos
+
+**Pré-condição:** Ao menos um curso cadastrado com datas de início e fim.
+
+| Campo verificado  | Formato esperado | Formato obtido |
+|-------------------|------------------|----------------|
+| Data de início    | 18/03/2026       | 2026-03-18     |
+| Data de fim       | 30/06/2026       | 2026-06-30     |
+
+**Resultado esperado:** Datas exibidas no formato `dd/mm/aaaa`.
+**Resultado obtido:** Datas exibidas no formato bruto ISO `YYYY-MM-DD`.
+**Status:** Falhou — ver **BUG-010**
+
+---
+
+### CT-009 - Exclusão de curso existente
+
+**Pré-condição:** Ao menos um curso cadastrado e visível na listagem.
+
+| Ação                              | Detalhe                        |
+|-----------------------------------|--------------------------------|
+| Clicar no botão "Excluir Curso"   | Curso existente na listagem    |
+
+**Resultado esperado:** Curso excluído com sucesso (HTTP 200 ou 204) e removido da listagem.
+**Resultado obtido:** HTTP 405 Method Not Allowed.
+**Status:** Falhou — ver **BUG-001**
+
+---
+
+### CT-010 - Clicar no logo "Beedoo QA Challenge" no header
+
+**Pré-condição:** Usuário está em qualquer página da aplicação.
+
+| Ação                                          | Detalhe                        |
+|-----------------------------------------------|--------------------------------|
+| Clicar no letreiro "Beedoo QA Challenge"      | Canto esquerdo do header       |
+
+**Resultado esperado:** Usuário é redirecionado para a tela de listagem de cursos.
+**Resultado obtido:** Nenhuma ação ocorre ao clicar no logo.
+**Status:** Falhou — ver **BUG-004**
+
+---
+
+### CT-011 - Edição de curso existente via API (PUT/PATCH)
+
+**Pré-condição:** Ao menos um curso cadastrado.
+
+| Ação                                              | Detalhe                                                      |
+|---------------------------------------------------|--------------------------------------------------------------|
+| Realizar requisição `PUT` ou `PATCH` para `/test-api/courses/{id}` | Com payload de atualização do curso |
+
+**Resultado esperado:** Curso atualizado com sucesso (HTTP 200).
+**Resultado obtido:** Endpoint inexistente / não implementado.
+**Status:** Falhou — ver **BUG-002**
+
+---
+
+### CT-012 - Buscar detalhes de um curso por ID via API (GET)
+
+**Pré-condição:** Ao menos um curso cadastrado com ID conhecido.
+
+| Ação                                              | Detalhe                           |
+|---------------------------------------------------|-----------------------------------|
+| Realizar requisição `GET` para `/test-api/courses/{id}` | Com ID de curso existente   |
+
+**Resultado esperado:** Retorno dos detalhes completos do curso (HTTP 200).
+**Resultado obtido:** Endpoint inexistente / não implementado.
+**Status:** Falhou — ver **BUG-003**
+
+---
+
+### CT-013 - Persistência dos dados cadastrados na API
+
+**Pré-condição:** Usuário cadastra um ou mais cursos.
+
+| Ação                                          | Detalhe                                              |
+|-----------------------------------------------|------------------------------------------------------|
+| Cadastrar curso e inspecionar o localStorage  | Verificar se os dados são enviados ao endpoint POST  |
+
+**Resultado esperado:** Dados enviados e persistidos na API (`POST /test-api/courses`), disponíveis mesmo após limpar o navegador.
+**Resultado obtido:** Dados salvos apenas no localStorage do navegador, sem envio real à API.
+**Status:** Falhou — ver **BUG-012**
 
 ---
 
