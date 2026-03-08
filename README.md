@@ -6,6 +6,25 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 
 ---
 
+## Cenários Mais Críticos para Teste
+
+| Prioridade | Cenário | Motivo |
+|------------|---------|--------|
+| 🔴 Crítica | **CT-013** - Persistência dos dados na API | Dados salvos apenas no localStorage — perda total ao limpar o navegador |
+| 🔴 Alta | **CT-002** - Cadastro com campos obrigatórios vazios | Sistema não valida nenhum campo, permitindo registros completamente inválidos |
+| 🔴 Alta | **CT-003** - Data de fim anterior à data de início | Cadastro aceita datas logicamente impossíveis |
+| 🔴 Alta | **CT-004** - Número de vagas negativo | Valor negativo compromete a integridade dos dados do curso |
+| 🔴 Alta | **CT-009** - Exclusão de curso | Funcionalidade principal retorna HTTP 405 — completamente quebrada |
+| 🟡 Média | **CT-005** - URL de imagem de capa inválida | Campo aceita qualquer texto sem validação de formato |
+| 🟡 Média | **CT-006** - Link de inscrição inválido | Campo de URL não valida o formato para cursos online |
+| 🟡 Média | **CT-011** - Edição de curso via API | Endpoint PUT/PATCH inexistente — impossível editar cursos |
+| 🟡 Média | **CT-012** - Detalhes de curso por ID via API | Endpoint GET por ID inexistente |
+| 🟢 Baixa | **CT-007** - Listagem vazia sem mensagem | UX prejudicada sem feedback ao usuário |
+| 🟢 Baixa | **CT-008** - Formato de datas na listagem | Datas exibidas em formato ISO bruto |
+| 🟢 Baixa | **CT-010** - Logo sem redirecionamento | Clique no logo não navega para listagem |
+
+---
+
 ## Principais Fluxos Disponíveis
 
 - **Cadastro de curso:** Formulário com os campos Nome do curso, Descrição, Instrutor, URL da imagem de capa, Data de início, Data de fim, Número de vagas e Tipo de curso.
@@ -61,6 +80,9 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 **Resultado obtido:** Curso é cadastrado com sucesso mesmo sem nenhum dado preenchido.
 **Status:** Falhou — ver **BUG-005**
 
+**Evidência:**
+![Evidência - Cadastro com campos vazios](src/imgs/info-vazia.PNG)
+
 ---
 
 ### CT-003 - Cadastro de curso com data de fim anterior à data de início
@@ -75,6 +97,9 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 **Resultado esperado:** Sistema valida e bloqueia o cadastro com mensagem de erro informando que a data de fim não pode ser anterior à data de início.
 **Resultado obtido:** Curso é cadastrado com sucesso mesmo com data de fim inválida.
 **Status:** Falhou — ver **BUG-007**
+
+**Evidência:**
+![Evidência - Data de fim anterior à data de início](src/imgs/evidencia-data-discrepante.PNG)
 
 ---
 
@@ -103,6 +128,9 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 **Resultado esperado:** Sistema valida e bloqueia o cadastro informando que a URL deve ser válida (ex: `https://...`).
 **Resultado obtido:** Curso é cadastrado com sucesso com valor inválido no campo de URL.
 **Status:** Falhou — ver **BUG-009**
+
+**Evidência:**
+![Evidência - Cadastro sem URL válida de imagem](src/imgs/evidencia-sem-url-imagem.PNG)
 
 ---
 
@@ -217,6 +245,9 @@ A aplicação é uma plataforma de gerenciamento de cursos que permite cadastrar
 **Resultado esperado:** Dados enviados e persistidos na API (`POST /test-api/courses`), disponíveis mesmo após limpar o navegador.
 **Resultado obtido:** Dados salvos apenas no localStorage do navegador, sem envio real à API.
 **Status:** Falhou — ver **BUG-012**
+
+**Evidência:**
+![Evidência - Dados salvos apenas no localStorage](src/imgs/local-storage.PNG)
 
 ---
 
